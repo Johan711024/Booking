@@ -49,6 +49,8 @@ namespace Booking.Controllers
                 {
                     _context.ApplicationUserGymClass.Remove(gymClass);
                     await _context.SaveChangesAsync();
+
+
                 }
             }
 
