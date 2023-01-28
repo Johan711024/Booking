@@ -10,6 +10,6 @@
         public DateTime EndTim { get { return StartTime + Duration; } }
         public string? Description { get; set; }
 
-        public ICollection<ApplicationUser>? Attendants { get; set; }
+        public List<ApplicationUserGymClass>? Attendants { get; set; }
     }
 }

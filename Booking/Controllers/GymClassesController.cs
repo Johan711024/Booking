@@ -148,7 +148,7 @@ namespace Booking.Controllers
             var detailsWithAttendants = await _context.GymClass
                 .Include(au => au.ApplicationUserGymClasses)
                     .ThenInclude(g => g.ApplicationUser)
-                .Where(i => i.Id== id).ToListAsync();
+                .Where(i => i.Id== id).FirstOrDefaultAsync();
 
 
 
@@ -157,24 +157,27 @@ namespace Booking.Controllers
             //    .FirstOrDefaultAsync(m => m.Id == id);
 
 
-            if (detailsWithAttendants[0] == null)
+            if (detailsWithAttendants == null)
             {
                 return NotFound();
             }
 
+            if (detailsWithAttendants.ApplicationUserGymClasses == null)
+            {
 
+            }
 
 
             var viewModel = new DetailsViewModel
             {
-                GymClassId = detailsWithAttendants[0].Id,
-                Description = detailsWithAttendants[0].Description,
-                Duration = detailsWithAttendants[0].Duration,
-                StartTime = detailsWithAttendants[0].StartTime,
+                GymClassId = detailsWithAttendants.Id,
+                Description = detailsWithAttendants.Description,
+                Duration = detailsWithAttendants.Duration,
+                StartTime = detailsWithAttendants.StartTime,
 
-                GymClassName = detailsWithAttendants[0].Name,
+                GymClassName = detailsWithAttendants.Name,
 
-                //Attendants = detailsWithAttendants[0].ApplicationUserGymClasses
+                Attendants = detailsWithAttendants.ApplicationUserGymClasses.ToList(),
             };
 
 
