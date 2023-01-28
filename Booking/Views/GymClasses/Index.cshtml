@@ -1,19 +1,21 @@
-﻿@model IEnumerable<Booking.Models.GymClass>
+﻿@model IEnumerable<Booking.Models.ViewModels.GymClassWithUsersViewModel>
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Boka gympass</h1>
 
-<p>
+
+@if (User.IsInRole("Admin"))
+{
     <a asp-action="Create">Create New</a>
-</p>
+}
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @Html.DisplayNameFor(model => model.GymClassName)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.StartTime)
@@ -31,7 +33,7 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Name)
+                    @Html.DisplayFor(modelItem => item.GymClassName)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.StartTime)
@@ -41,20 +43,29 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Description)
+                    |@Html.DisplayFor(modelItem => item.ApplicationUserId)|
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> |
+                    @if (User.IsInRole("Admin"))
+                    {
+                    <a asp-action="Edit" asp-route-id="@item.GymClassId"> Edit </a><span>|</span>
+                        <a asp-action="Details" asp-route-id="@item.GymClassId"> Details </a>
 
-                    @if (item.ApplicationUserGymClasses.Count > 0)
-                    {
-                        <a asp-action="BookingToggle" asp-route-id="@item.Id">Avboka</a>
+                        <span>|</span>
+                        <a asp-action="Delete" asp-route-id="@item.GymClassId"> Delete </a>
+
+                        <span>|</span>
                     }
+                    @if(item.attending)
+                    {
+                            <a asp-action="BookingToggle" asp-route-id="@item.GymClassId">Avboka</a>
+                        }
                     else
-                    {
-                        <a asp-action="BookingToggle" asp-route-id="@item.Id">Boka</a>
-                    }
+                        {
+                            <a asp-action="BookingToggle" asp-route-id="@item.GymClassId">Boka</a>
+                        }
+                    
+                   
 
 
             </td>
