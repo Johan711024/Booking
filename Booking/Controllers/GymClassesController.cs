@@ -81,7 +81,7 @@ namespace Booking.Controllers
         }
 
         // GET: GymClasses
-        public async Task<IActionResult> Index(bool showAll = false)
+        public async Task<IActionResult> Index(bool showAll = false, int menu=0)
         {
             var userId = userManager.GetUserId(User);
 
@@ -89,15 +89,34 @@ namespace Booking.Controllers
 
             ViewData["showAll"] = !showAll;
 
-            if (showAll == false) { 
+            if (menu == 1) {
 
                 GymClassListwithUserBookings = await _context.GymClass
-                    .Include(a => a.ApplicationUserGymClasses).ToListAsync();
+                    .Include(a=>a.ApplicationUserGymClasses)
+                       
+                       .Where(au=>au.ApplicationUserGymClasses.Any(i=>i.ApplicationUserId==userId && i.GymClass.StartTime >= DateTime.Now) )
+                    .ToListAsync();
             }
-            else
+            else if (menu == 2)
             {
                 GymClassListwithUserBookings = await _context.GymClass
-                    .Include(a => a.ApplicationUserGymClasses).Where(i => i.StartTime> DateTime.Now).ToListAsync();
+                    .Include(a => a.ApplicationUserGymClasses)
+
+                       .Where(au => au.ApplicationUserGymClasses.Any(i => i.ApplicationUserId == userId && i.GymClass.StartTime < DateTime.Now))
+                    .ToListAsync();
+            }
+            else {
+                if (showAll == false)
+                {
+
+                    GymClassListwithUserBookings = await _context.GymClass
+                        .Include(a => a.ApplicationUserGymClasses).ToListAsync();
+                }
+                else
+                {
+                    GymClassListwithUserBookings = await _context.GymClass
+                        .Include(a => a.ApplicationUserGymClasses).Where(i => i.StartTime > DateTime.Now).ToListAsync();
+                }
             }
 
             var viewModel = GymClassListwithUserBookings

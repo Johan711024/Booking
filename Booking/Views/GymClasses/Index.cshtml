@@ -1,17 +1,18 @@
 ﻿@model IEnumerable<Booking.Models.ViewModels.GymClassWithUsersViewModel>
 
 @{
+    
     ViewData["Title"] = "Index";
     var showAll = ViewData["showAll"];
     
 }
 
-<h1>Boka gympass</h1>
+<h1>ViewData["Title"]</h1>
 
 
 @if (User.IsInRole("Admin"))
 {
-    <a asp-action="Create">Create New</a>
+    <p> <a asp-action="Create">Create New</a></p>
 }
 
 
