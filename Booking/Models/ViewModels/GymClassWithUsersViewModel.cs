@@ -16,6 +16,7 @@
         public TimeSpan Duration { get; set; }
         public DateTime EndTim { get { return StartTime + Duration; } }
         public string? Description { get; set; }
+        
 
 
 

@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Data;
 using System.Collections.Immutable;
 using NuGet.Versioning;
+using Microsoft.Data.SqlClient;
 
 namespace Booking.Controllers
 {
@@ -80,17 +81,26 @@ namespace Booking.Controllers
         }
 
         // GET: GymClasses
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(bool showAll = false)
         {
             var userId = userManager.GetUserId(User);
 
-            var GymClassListwithUserBookings = await _context.GymClass
-                .Include(a => a.ApplicationUserGymClasses).ToListAsync();
+            var GymClassListwithUserBookings = new List<GymClass>();
 
+            ViewData["showAll"] = !showAll;
 
-            
+            if (showAll == false) { 
 
-                var viewModel = GymClassListwithUserBookings
+                GymClassListwithUserBookings = await _context.GymClass
+                    .Include(a => a.ApplicationUserGymClasses).ToListAsync();
+            }
+            else
+            {
+                GymClassListwithUserBookings = await _context.GymClass
+                    .Include(a => a.ApplicationUserGymClasses).Where(i => i.StartTime> DateTime.Now).ToListAsync();
+            }
+
+            var viewModel = GymClassListwithUserBookings
                 .Select(s => new GymClassWithUsersViewModel
                 {
                     
@@ -101,6 +111,7 @@ namespace Booking.Controllers
                     StartTime = s.StartTime,
                     Duration = s.Duration,
                     Description = s.Description
+                    
                 })
                 .ToList();
 

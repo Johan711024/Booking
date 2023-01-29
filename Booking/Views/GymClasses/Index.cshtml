@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Index";
+    var showAll = ViewData["showAll"];
+    
 }
 
 <h1>Boka gympass</h1>
@@ -11,6 +13,24 @@
 {
     <a asp-action="Create">Create New</a>
 }
+
+
+<button onclick="location.href='/?showAll=@showAll'">
+
+    @if (showAll.Equals(false))
+    {
+
+        <span>Visa äldre gympass i listan</span>
+    }
+    else
+    {
+        <span>Visa endast aktuella pass listan</span>
+    }
+
+
+
+</button>
+
 <table class="table">
     <thead>
         <tr>
