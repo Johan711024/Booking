@@ -2,10 +2,10 @@
 
 #nullable disable
 
-namespace Booking.Data.Migrations
+namespace Booking.Migrations
 {
     /// <inheritdoc />
-    public partial class _11 : Migration
+    public partial class names11 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

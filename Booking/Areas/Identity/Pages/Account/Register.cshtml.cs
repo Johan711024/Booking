@@ -19,6 +19,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using System.Security.Claims;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Booking.Areas.Identity.Pages.Account
 {
@@ -71,6 +73,18 @@ namespace Booking.Areas.Identity.Pages.Account
         /// </summary>
         public class InputModel
         {
+
+            
+            [Display(Name = "First Name")]
+            public string FirstName { get; set; }
+
+
+
+            [Display(Name = "Last Name")]
+            public string? LastName { get; set; }
+
+
+
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
@@ -115,15 +129,48 @@ namespace Booking.Areas.Identity.Pages.Account
             {
                 var user = CreateUser();
 
+
+                //Fälten FirstName o LastName är inlagda i klassen ApplicationUser och finns därför i databasen. Exponeras via user objektet.
+                user.FirstName = Input.FirstName;
+                user.LastName = Input.LastName;
+
+
+                //await _userStore.SetUserNameAsync(user, Input.FirstName, CancellationToken.None);
+                //await _userStore.SetUserNameAsync(user, Input.LastName, CancellationToken.None);
+
+                
+                //Sparar epost i Name-fältet i db
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+
+                //Sparar epost i Epost-fältet i db
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+
+                //Sparar password och user objektet som nu har satta värden
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {
+                    
                     _logger.LogInformation("User created a new account with password.");
 
                     var userId = await _userManager.GetUserIdAsync(user);
+
+                    //var firstName= _userManager.AddClaimAsync(user);
+
+
+
+                    //hämtar alla claims
+
+                    var claims = await _userManager.GetClaimsAsync(user);
+
+                    //sätter ny claim
+
+                    await _userManager.AddClaimAsync(user, new Claim("FirstName", Input.FirstName));
+                    await _userManager.AddClaimAsync(user, new Claim("LastName", Input.LastName));
+
+
+
+
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                     var callbackUrl = Url.Page(
@@ -144,6 +191,8 @@ namespace Booking.Areas.Identity.Pages.Account
                         await _signInManager.SignInAsync(user, isPersistent: false);
                         return LocalRedirect(returnUrl);
                     }
+
+                    
                 }
                 foreach (var error in result.Errors)
                 {
