@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Bogus.DataSets;
+using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace Booking.Models
 {
@@ -6,7 +8,10 @@ namespace Booking.Models
     {
         public int Id { get; set; }
 
+        [Display(Name = "Förnamn")]
         public string? FirstName { get; set; }
+
+        [Display(Name = "Efternamn")]
         public string? LastName { get; set; }
         public string FullName { get { return FirstName + " " + LastName; } }
 
