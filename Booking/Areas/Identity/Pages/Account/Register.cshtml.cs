@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 using System.Diagnostics.CodeAnalysis;
+using Booking.Validations;
 
 namespace Booking.Areas.Identity.Pages.Account
 {
@@ -81,6 +82,8 @@ namespace Booking.Areas.Identity.Pages.Account
 
 
             [Display(Name = "Last Name")]
+
+            [FirstAndLastName]
             public string? LastName { get; set; }
 
 
