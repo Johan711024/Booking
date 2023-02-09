@@ -1,9 +1,10 @@
 ﻿using Bogus;
-using Booking.Data;
-using Booking.Models;
+using Booking.Core.Entities;
+using Booking.Data.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Booking
+namespace Booking.Data
 {
     public class SeedData
     {
@@ -57,7 +58,7 @@ namespace Booking
             {
                 UserName = adminEmail,
                 Email = adminEmail,
-                FirstName= "Johnny",
+                FirstName = "Johnny",
                 LastName = "Here Comes...",
 
             };
@@ -93,7 +94,8 @@ namespace Booking
                     Name = faker.Company.CatchPhrase(),
                     Description = faker.Hacker.Verb(),
                     Duration = new TimeSpan(0, 55, 0),
-                    StartTime = DateTime.Now.AddDays(faker.Random.Int(-5, 5))
+                    StartTime = DateTime.Now.AddDays(faker.Random.Int(-5, 5)),
+                    Created = DateTime.Now
                 };
 
                 gymClasses.Add(temp);

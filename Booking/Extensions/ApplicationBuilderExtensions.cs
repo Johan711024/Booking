@@ -1,4 +1,5 @@
 ﻿using Booking.Data;
+using Booking.Data.Data;
 
 namespace Booking.Extensions
 {

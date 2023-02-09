@@ -12,7 +12,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using Booking.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -22,6 +21,7 @@ using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 using System.Diagnostics.CodeAnalysis;
 using Booking.Validations;
+using Booking.Core.Entities;
 
 namespace Booking.Areas.Identity.Pages.Account
 {

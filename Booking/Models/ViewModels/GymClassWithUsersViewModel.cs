@@ -1,4 +1,6 @@
-﻿namespace Booking.Models.ViewModels
+﻿using Booking.Core.Entities;
+
+namespace Booking.Models.ViewModels
 {
     public class GymClassWithUsersViewModel
     {

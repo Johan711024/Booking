@@ -1,6 +1,8 @@
-using Booking.Data;
+
+using Booking.Core.Entities;
+using Booking.Data.Data;
+using Booking.Data.Repositories;
 using Booking.Extensions;
-using Booking.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,6 +10,7 @@ namespace Booking
 {
     public class Program
     {
+        
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +20,8 @@ namespace Booking
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+            builder.Services.AddScoped<UnitOfWork>();
 
             builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
                 .AddRoles<IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();

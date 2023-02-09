@@ -1,17 +1,24 @@
-﻿@using Microsoft.AspNetCore.Identity
+﻿@using Booking.Core.Entities;
+@using Microsoft.AspNetCore.Identity
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
 @{
     var userId = UserManager.GetUserId(User);
     var claims = User.Claims;
-    var firstName = "";
-    var lastName = "";
 
-    if (claims.Count()>0){
-        firstName = claims.FirstOrDefault(c => c.Type == "FirstName").Value;
-        lastName = claims.FirstOrDefault(c => c.Type == "LastName").Value;
+    var textOnLink = "";
+
+    // .Any :returnerar bool
+    // .FirstOrDefault med .Value efter anropet :returnerar String
+    if (User.Claims.Any(c => c.Type.Equals("FirstName"))) {
+        textOnLink = claims.FirstOrDefault(c => c.Type == "FirstName")?.Value + " " + claims.FirstOrDefault(c => c.Type == "LastName")?.Value;
+
     }
+    else{
+            textOnLink = User.Identity?.Name;
+    } 
+    
 }
 
 <ul class="navbar-nav">
@@ -19,7 +26,9 @@
 {
         <li class="nav-item">
 
-            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage"> Inloggad som: <b>@firstName @lastName</b> @*@User.Identity?.Name*@</a>
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage"> Inloggad som: <b>@textOnLink</b>
+
+            </a>
     </li>
     <li class="nav-item">
         <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "GymClasses", new { area = "" })">

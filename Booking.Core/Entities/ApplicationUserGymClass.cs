@@ -1,4 +1,4 @@
-﻿namespace Booking.Models
+﻿namespace Booking.Core.Entities
 {
     public class ApplicationUserGymClass
     {

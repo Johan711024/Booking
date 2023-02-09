@@ -1,8 +1,8 @@
-﻿using Bogus.DataSets;
+﻿
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 
-namespace Booking.Models
+namespace Booking.Core.Entities
 {
     public class ApplicationUser : IdentityUser
     {

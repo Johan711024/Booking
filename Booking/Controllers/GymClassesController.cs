@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Booking.Data;
+
 using Booking.Models;
 using Microsoft.AspNetCore.Identity;
 using Booking.Models.ViewModels;
@@ -15,42 +15,51 @@ using System.Data;
 using System.Collections.Immutable;
 using NuGet.Versioning;
 using Microsoft.Data.SqlClient;
+using Booking.Data.Data;
+using Booking.Core.Entities;
+using Booking.Data.Repositories;
 
 namespace Booking.Controllers
 {
     public class GymClassesController : Controller
     {
+        private readonly UnitOfWork uow;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
 
-        public GymClassesController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public GymClassesController(UnitOfWork uow, ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
+            this.uow = uow;
             _context = context;
             this.userManager = userManager;
             this.roleManager = roleManager;
         }
 
-        public async Task<IActionResult> BookingToggle(int? id)
-        {
+        public async Task<IActionResult> BookingToggle(int? id) { 
+
+            if (id is null) return BadRequest();
+        
             if (!User.Identity.IsAuthenticated)
             {
                 return RedirectToAction("Login", "Account", new { Area = "Identity" });
-
-
-                
             }
-            if (id == null) return BadRequest();
-            
-            var userId = userManager.GetUserId(User); //ramverket fixar med cookie innehåll (se program.cs) tillbaka till server
-            if (userId == null) return BadRequest();
 
+            // var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            //ramverket fixar med cookie innehåll (se program.cs) tillbaka till server
+            var userId = userManager.GetUserId(User);
+
+            if (userId == null) return NotFound();
 
             var gymClassId = id;
 
-            var booked = await _context.ApplicationUserGymClass.FirstOrDefaultAsync(c => c.GymClassId == gymClassId && c.ApplicationUserId == userId);
+            //var attending = await _context.ApplicationUserGymClass.FindAsync(userId, id); //samma som nedan
 
-            //var attending = await _context.ApplicationUserGymClass.FindAsync(userId, id); //samma som ovan
+            //****Plockar ut för att se om användare bokad på klickad kurs. Kan ej skicka tillbaka bool pga ...await...?
+            // VARFÖR FUNKAR INTE NEDANSTÅENDE??
+            //ApplicationUserGymClass? booked = await uow.applicationUserGymClassRepository.FindAsync(userId, (int)gymClassId);
+
+            ApplicationUserGymClass? booked = await _context.ApplicationUserGymClass.FindAsync(userId, gymClassId);
 
 
             if (booked == null)
@@ -59,25 +68,18 @@ namespace Booking.Controllers
                 applicationUserGymClass.GymClassId = (int)gymClassId;  //cast pga int? id
                 applicationUserGymClass.ApplicationUserId = userId;
 
+                //uow.applicationUserGymClassRepository.add(applicationUserGymClass);
                 _context.Add(applicationUserGymClass);
-                await _context.SaveChangesAsync();
+                await uow.CompleteAsync();
             }
             else
             {
-                var gymClass = await _context.ApplicationUserGymClass.FirstOrDefaultAsync(au => au.GymClassId == gymClassId && au.ApplicationUserId == userId);  //finns redan...?
-                if (gymClass != null)
-                {
-                    _context.ApplicationUserGymClass.Remove(gymClass);
-                    await _context.SaveChangesAsync();
-
-
-                }
+                _context.ApplicationUserGymClass.Remove(booked);
+                //uow.applicationUserGymClassRepository.remove(booked);
+                await uow.CompleteAsync();
             }
 
-
             return RedirectToAction(nameof(Index));
-
-
         }
 
         // GET: GymClasses
@@ -91,11 +93,13 @@ namespace Booking.Controllers
 
             if (menu == 1) {
 
-                GymClassListwithUserBookings = await _context.GymClass
-                    .Include(a=>a.ApplicationUserGymClasses)
-                       
-                       .Where(au=>au.ApplicationUserGymClasses.Any(i=>i.ApplicationUserId==userId && i.GymClass.StartTime >= DateTime.Now) )
-                    .ToListAsync();
+                GymClassListwithUserBookings = (List<GymClass>)await uow.gymClassRepository.GymClassListwithUserBookings(userId);
+
+                //GymClassListwithUserBookings = await _context.GymClass
+                //    .Include(a=>a.ApplicationUserGymClasses)
+                //    .Where(au=>au.ApplicationUserGymClasses.
+                //    Any(i=>i.ApplicationUserId==userId && i.GymClass.StartTime >= DateTime.Now) )
+                //    .ToListAsync();
             }
             else if (menu == 2)
             {
